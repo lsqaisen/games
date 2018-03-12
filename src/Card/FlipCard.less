@@ -1,0 +1,63 @@
+.asui-card-flip-box {
+    float: left;
+    width: 365px;
+    height: 300px;
+    position: relative;
+    perspective: 800px;
+    .asui-card {
+        background-color: transparent;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        transform-style: preserve-3d;
+        transition: transform 1s;
+        .asui-card-flip-figure {
+            margin: 0;
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            &.front {
+                background: palegoldenrod;
+            }
+            &.back {
+                transform: rotateY(-180deg);
+                background: paleturquoise;
+            }
+        }
+    }
+}
+
+.asui-card-flip-center {
+    .asui-card {
+        transform-origin: center center;
+    }
+    &.asui-card-flipped {
+        .asui-card {
+            transform: rotateY( 180deg);
+        }
+    }
+}
+
+.asui-card-flip-right {
+    .asui-card {
+        transform-origin: right center;
+    }
+    &.asui-card-flipped {
+        .asui-card {
+            transform: translateX(-100%) rotateY(-180deg);
+        }
+    }
+}
+
+.asui-card-flip-left {
+    .asui-card {
+        transform-origin: left center;
+    }
+    &.asui-card-flipped {
+        .asui-card {
+            transform: translateX(100%) rotateY(180deg);
+        }
+    }
+}
