@@ -3,9 +3,7 @@ import ReactDOM from 'react-dom'
 import { Link } from 'dva/router'
 import './index.less'
 
-import Card from './Card/Card'
-import FlipCard from './Card/FlipCard'
-import PileCard from './Card/PileCard'
+import { Card, FlipCard, PileCard } from './components/Card/'
 
 const App = () => {
     return (
@@ -58,6 +56,7 @@ export class Layout extends React.Component<any, any>{
             <div>
                 <Link to="/home">home</Link>
                 <Link to="/filpcard">filpcard</Link>
+                <Link to="/animalchess">animalchess</Link>
                 {children}
             </div>
         )

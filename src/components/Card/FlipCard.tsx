@@ -6,25 +6,23 @@ import Card from './Card'
 export declare type flipCardAxisType = 'left' | 'center' | 'right';
 
 export interface FlipCardProps {
+    flip?: boolean,
     className?: string,
     type?: string,
     axis?: flipCardAxisType,
     style?: object,
     frontChildren?: any,
     backChildren?: any,
+    onFlip?: () => any,
 }
 
-export interface FlipCardState {
-    isFlip: boolean,
-}
+export default class FlipCard extends React.Component<FlipCardProps, {}> {
+    static defaultProps: {
+        flip: false,
+    }
 
-export default class FlipCard extends React.Component<FlipCardProps, FlipCardState> {
-    public state: FlipCardState;
     constructor(props: FlipCardProps) {
         super(props);
-        this.state = {
-            isFlip: false,
-        }
     }
 
     onFlip(isFlip: boolean) {
@@ -32,14 +30,15 @@ export default class FlipCard extends React.Component<FlipCardProps, FlipCardSta
     }
 
     render() {
-        const { axis, frontChildren, backChildren } = this.props;
+        const { flip, axis, frontChildren, backChildren, onFlip } = this.props;
         const cardData = { style: this.props.style };
         return (
             <section
-                className={`asui-card-flip-box asui-card-flip-${axis || 'center'} ${this.state.isFlip ? 'asui-card-flipped' : ''} ${this.props.className || ''}`}
-                onClick={() => this.onFlip(!this.state.isFlip)}
+                className={`asui-card-flip-box asui-card-flip-${axis || 'center'} ${flip ? 'asui-card-flipped' : ''} ${this.props.className || ''}`}
+                {...cardData}
+                onClick={onFlip}
             >
-                <Card className={``} {...cardData} >
+                <Card className={``} >
                     <figure className="asui-card-flip-figure front">{frontChildren}</figure>
                     <figure className="asui-card-flip-figure back">{backChildren}</figure>
                 </Card>

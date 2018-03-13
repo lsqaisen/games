@@ -3,9 +3,12 @@ import { Router, Route } from 'dva/router'
 
 import App, { Layout } from './layout'
 
+import AnimalChess from './routes/AnimalChess/'
+
 export default function ({ history }: any) {
     return <Router history={history}>
         <Layout>
+            <Route path="/animalchess" component={AnimalChess} />
             <Route path="/filpcard" render={() => <div> xxx</div>} />
             <Route path="/home" render={() => <App />} />
         </Layout>
