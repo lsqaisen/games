@@ -45,12 +45,6 @@ export default {
         flip(state, { payload: { index } }) {
             let { chessmans } = state;
             chessmans[index].flip = true;
-            // let key = 0;
-            // while (!key) {
-            //     key = Math.floor(Math.random() * 25 - 12);
-            //     if (chessmans.some(v => v.key === key)) key = 0;
-            // }
-            // chessmans[index].key = key;
             return {
                 ...state,
                 chessmans,
@@ -88,5 +82,7 @@ export default {
                 player: state.player === 1 ? -1 : 1,
             }
         },
+
+        
     }
 }
