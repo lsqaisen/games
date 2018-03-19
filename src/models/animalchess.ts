@@ -83,6 +83,10 @@ export default {
             }
         },
 
-        
+        eat(state, { payload: { eater } }) {
+            return ({
+
+            })
+        }
     }
 }
