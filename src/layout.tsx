@@ -57,6 +57,7 @@ export class Layout extends React.Component<any, any>{
                 <Link to="/home">home</Link>
                 <Link to="/filpcard">filpcard</Link>
                 <Link to="/animalchess">animalchess</Link>
+                <Link to="/gobang">gobang</Link>
                 {children}
             </div>
         )
