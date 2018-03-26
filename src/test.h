@@ -1163,3 +1163,280 @@ int main(int argc, char *argv[])
         system("PAUSE");
         return EXIT_SUCCESS;
 }
+
+
+
+
+int alpha_beta(int alpha, int beta, int depth, int pass){
+	// 当前最佳估值，预设为负无穷大
+	int best_value = -INF_VALUE;
+	// 如果到达预定的搜索深度
+	if (depth <= 0) {
+		// 直接给出估值
+		return evaluation();
+	}
+	// 尝试每个下棋位置
+	for (int pos=A1; pos<=H8; ++pos) {
+		// 试着下这步棋，如果棋步合法
+		if (make_move(pos)) {
+			// 对所形成的局面进行递归搜索
+			int value = -alpha_beta(-beta, -alpha, depth-1, 0);
+			// 恢复原来的局面
+			unmake_move(pos);
+			// 如果这步棋引发剪枝
+			if (value >= beta) {
+				// 停止对当前局面的搜索，立即返回
+				return value;
+			}
+			// 如果这步棋更好
+			if (value > best_value) {
+				// 保存更好的结果
+				best_value = value;
+				// 更新估值下限
+				if (value > alpha) {
+					alpha = value;
+				}
+			}
+		}
+	}
+	// 如果没有合法棋步
+	if (best_value == -INF_VALUE) {
+		// 如果上一步棋也是弃着，表明对局结束
+		if (pass) {
+			// 计算出盘面的精确比分
+			return get_exact();
+		}
+		// 否则这步棋弃着
+		pass_move();
+		// 递归搜索，并标明该步弃着
+		best_value = -alpha_beta(-beta, -alpha, depth, 1);
+		// 恢复原来的局面
+		unpass_move();
+	}
+	// 返回最佳估值
+	return best_value;
+}
+
+
+
+//alpha是指遍历过的节点中目前为止找到最小的，beta是指遍历过的节点中目前为止找到最大的   
+int min_alphabeta(int depth,int i1,int i2,int alpha,int beta)  
+{  
+    int res=evaluate_minmax_noalphabeta();  
+    Chess cc;  
+    cc.chess_isover(i1,i2,2);  
+    if(isover!=0||depth<=0)  
+    {  
+        isover=0;  
+        return res;  
+    }  
+    vector< pair<int,int> > v;  
+    generatepoint(v);  
+    int len=v.size();  
+    int best=INT_MAX;  
+    for(int i=0;i<len;++i)  
+    {  
+        pos[v[i].first][v[i].second]=1;  
+        //【AAAAA】我是极小层，我要的是更小的数。我找过的孩子中，目前为止找到的最小的数是best，如果best小于了前辈们之前找到的最小值，那么我将更新它，并且告诉下面未遍历过的孩子，比alpha大的数就不要再给我了   
+        int tmp=max_alphabeta(depth-1,v[i].first,v[i].second,best<alpha?best:alpha,beta);   
+        pos[v[i].first][v[i].second]=0;  
+        if(tmp<best) best=tmp;  
+        if(tmp<beta) break;  
+          
+    }   
+    return best;  
+}  
+int max_alphabeta(int depth,int i1,int i2,int alpha,int beta)  
+{  
+    int res=evaluate_minmax_noalphabeta();  
+    Chess cc;  
+    cc.chess_isover(i1,i2,1);  
+    if(isover!=0||depth<=0)  
+    {  
+        isover=0;  
+        return res;  
+    }  
+    vector< pair<int,int> > v;  
+    generatepoint(v);  
+    int len=v.size();  
+    int best=INT_MIN;  
+    for(int i=0;i<len;++i)  
+    {  
+        pos[v[i].first][v[i].second]=2;  
+        int tmp=min_alphabeta(depth-1,v[i].first,v[i].second,alpha,best>beta?best:beta);  
+        pos[v[i].first][v[i].second]=0;   
+        if(tmp>best) best=tmp; //【AAAAA】这是极大层，电脑选取最大值点。到目前为止(i=0)，已知tmp。那么该层向上返回的值将不小于tmp  
+        if(tmp>alpha)    break;//【AAAAA】我的上一层告诉我，它找到的最小的数是alpha，它是极小层，他需要更小的数。如果我找到的tmp比alpha大，那么就不要找了，因为我是极大层，我只会返回更大的数给上一层   
+    }   
+    return best;  
+}  
+void Chess::chess_ai_minmax_alphabeta(int &x,int &y,int depth)  
+{  
+    vector< pair<int,int> > v;  
+    generatepoint(v);  
+    int best=INT_MIN;  
+    int len=v.size();  
+    vector< pair<int,int> > v2;   
+    for(int i=0;i<len;++i)  
+    {  
+        pos[v[i].first][v[i].second]=2;   
+        int tmp=min_alphabeta(depth-1,v[i].first,v[i].second,INT_MAX,INT_MIN);  
+        if(tmp==best)  
+            v2.push_back(v[i]);  
+        if(tmp>best)  
+        {  
+            best=tmp;  
+            v2.clear();  
+            v2.push_back(v[i]);  
+        }  
+        pos[v[i].first][v[i].second]=0;       
+    }  
+    len=v2.size();  
+    int i=(int)(rand()%len);  
+    x=v2[i].first;  
+    y=v2[i].second;   
+}  
+
+
+
+var min = function(board, deep, alpha, beta) {
+  var v = evaluate(board);
+  total ++;
+  if(deep <= 0 || win(board)) {
+    return v;
+  }
+
+  var best = MAX;
+  var points = gen(board, deep);
+
+  for(var i=0;i<points.length;i++) {
+    var p = points[i];
+    board[p[0]][p[1]] = R.hum;
+    var v = max(board, deep-1, best < alpha ? best : alpha, beta);
+    board[p[0]][p[1]] = R.empty;
+    if(v < best ) {
+      best = v;
+    }
+    if(v < beta) {  //AB剪枝
+      ABcut ++;
+      break;
+    }
+  }
+  return best ;
+}
+
+
+var max = function(board, deep, alpha, beta) {
+  var v = evaluate(board);
+  total ++;
+  if(deep <= 0 || win(board)) {
+    return v;
+  }
+
+  var best = MIN;
+  var points = gen(board, deep);
+
+  for(var i=0;i<points.length;i++) {
+    var p = points[i];
+    board[p[0]][p[1]] = R.com;
+    var v = min(board, deep-1, alpha, best > beta ? best : beta);
+    board[p[0]][p[1]] = R.empty;
+    if(v > best) {
+      best = v;
+    }
+    if(v > alpha) { //AB 剪枝
+      ABcut ++;
+      break;
+    }
+  }
+  return best;
+}
+
+
+如上图所示，在第二层，也就是MIN层，当计算到第三个节点的时候，已知前面有一个3和一个6，也就是最小值为3。 在计算第三个节点的时候，发现它的第一个孩子的结果是5，因为它的孩子是MAX节点，而MAX节点是会选择最大值的，那么此节点的值不会比5小，因此此节点的后序孩子就没有必要计算了，因为这个节点不可能小于5，而同一层已经有一个值为3的节点了。
+
+其实这个图里面第三层分数为7的节点也是不需要计算的。
+
+这是 MAX 节点的剪枝，MIN节点的剪枝也是同样的道理，就不再讲了。 Alpha Beta 剪枝的 Alpha 和 Beta 分别指的是MAX 和 MIN节点。
+
+
+// 带Alpha-Beta剪枝的极大极小过程函数，按指定的深度，搜索产生一个走法  
+int ChessAI::maxMinWithAlphaBetaCut(int** chessBoard, int whiteOrBlack, int depth, Point opPos, int alpha, int beta)  
+{  
+    int bestValue, curValue;  // bestValue是最好的分数， curValue是试探下子后，该次下子的分数  
+  
+    if (isBE5AtPoint(chessBoard, whiteOrBlack == 2 ? 1 : 2, opPos))   // 如果在这里可以分出胜负  
+    {  
+        if (whiteOrBlack == 1)  // 电脑赢。这里为什么不是2呢？因为这里whiteOrBlack与opPos是相反关系  
+        {  
+            return FIVE_ALIKE;  
+        }  
+        else   // 玩家赢  
+        {  
+            return -FIVE_ALIKE;  
+        }  
+    }  
+    else if (depth == 0)   //深度为0，估值返回  
+    {  
+        bestValue = getValue(chessBoard);  
+    }  
+    else  
+    {  
+        // 下面开始是利用了剪枝思想的极大极小过程  
+        if (whiteOrBlack == 2)  // 此节点为电脑白子，取极大值  
+        {  
+            // 下面开始对各个可以下的子进行评分  
+            for (int i = 0; i <= 14; i++)  
+            {  
+                for (int j = 0; j <= 14; j++)  
+                {  
+                    if (chessBoard[i][j] == 0)  // 如果可以下子  
+                    {  
+                        if (alpha >= beta)  // alpha剪枝  
+                        {  
+                            return alpha;  
+                        }  
+                        chessBoard[i][j] = whiteOrBlack; // 试探下子  
+                        curValue = maxMinWithAlphaBetaCut(chessBoard, 1, depth - 1, cocos2d::Point(i, j), alpha, beta);  
+                        chessBoard[i][j] = 0;  // 撤消下子  
+                        if (curValue > alpha)  
+                        {  
+                            alpha = curValue; //子节点的最大值记录到alpha中  
+                        }  
+                    }  
+                }  
+            }  
+            bestValue = alpha;  
+        }// end if (whiteOrBlack == 2)  
+        else if (whiteOrBlack == 1)  // 此节点为玩家黑子，取极小值  
+        {  
+            for (int i = 0; i <= 14; i++)  
+            {  
+                for (int j = 0; j <= 14; j++)  
+                {  
+                    if (chessBoard[i][j] == 0)  // 如果可以下子  
+                    {  
+                        if (alpha >= beta)  // beta剪枝  
+                        {  
+                            return beta;  
+                        }  
+                        chessBoard[i][j] = whiteOrBlack; // 试探下子  
+                        curValue = maxMinWithAlphaBetaCut(chessBoard, 2, depth - 1, cocos2d::Point(i, j), alpha, beta);  
+                        chessBoard[i][j] = 0;  // 撤消下子  
+                        if (curValue < beta)  
+                        {  
+                            beta = curValue; //子节点的最小值记录到beta中  
+                        }  
+                    }  
+                }  
+            } // end else if (whiteOrBlack == 1)   
+            bestValue = beta;  
+        }  
+    }  // end else : (depth > 0)  
+  
+    return bestValue;  
+} 
+
+
+任何Max节点n的alpha值如果大于或等于它先辈节点的bete值，那么节点n以下的分支就不用搜索了。这是beta剪枝。
+任何Min节点的beta值如果小于或等于它先辈节点的alpha值，那么节点n以下的分支也不用搜索了。这是alpha剪枝。

@@ -1,9 +1,20 @@
 .gobang-box {
-    position: relative;
+    position: relative; // overflow: auto;
+    width: 25 * 15px;
+    height: 25 * 15px;
+    border: 1px solid #000;
     .unit {
+        z-index: -1;
+        float: left;
         position: absolute;
         width: 24px;
         height: 24px;
-        border: 1px solid #000;
+        // border: 1px solid transparent;
+        &.hei {
+            background-color: #000;
+        }
+        &.bai {
+            background-color: thistle;
+        }
     }
 }
